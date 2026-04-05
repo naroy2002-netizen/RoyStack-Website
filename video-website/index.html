@@ -840,6 +840,8 @@ footer {
           <div class="success-sig">— RoyStack</div>
         </div>
         <form id="cform">
+          <input type="hidden" name="access_key" value="117bb99e-b43d-4ea6-a901-5d779c360829">
+          <input type="hidden" name="subject" value="New RoyStack Inquiry">
           <div class="f-row">
             <div class="field">
               <label for="nm">Name</label>
@@ -916,7 +918,6 @@ footer {
     btn.classList.add('sending');
 
     const data = new FormData(form);
-    data.append('access_key', '117bb99e-b43d-4ea6-a901-5d779c360829');
 
     try {
       const res = await fetch('https://api.web3forms.com/submit', {
