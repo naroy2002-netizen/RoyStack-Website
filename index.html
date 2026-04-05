@@ -245,7 +245,7 @@ section { padding: 120px 52px; }
 
 .section-tag {
   font-family: 'Space Mono', monospace;
-  font-size: 9px;
+  font-size: 11px;
   letter-spacing: 0.38em;
   color: var(--amber);
   text-transform: uppercase;
@@ -262,12 +262,39 @@ section { padding: 120px 52px; }
 }
 
 h2 {
-  font-size: clamp(32px, 4vw, 54px);
+  font-size: clamp(40px, 5vw, 68px);
   font-weight: 700;
-  line-height: 1.06;
-  letter-spacing: -0.022em;
+  line-height: 1.04;
+  letter-spacing: -0.025em;
   color: var(--warm-wht);
 }
+
+/* ─────────────────────────────────────────
+   GRAIN TEXTURE
+───────────────────────────────────────── */
+#grain {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 1.2s ease;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.08'/%3E%3C/svg%3E");
+  background-size: 180px;
+}
+#grain.visible { opacity: 1; }
+
+/* video fade-out curtain */
+#video-curtain {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  background: var(--bg);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 1s ease;
+}
+#video-curtain.visible { opacity: 1; }
 
 /* reveal animation */
 .reveal {
@@ -347,23 +374,29 @@ h2 {
   margin-bottom: 24px;
 }
 .svc-card h3 {
-  font-size: 19px;
+  font-size: 21px;
   font-weight: 600;
   color: var(--warm-wht);
   letter-spacing: -0.01em;
   margin-bottom: 12px;
 }
 .svc-card p {
-  font-size: 13px;
+  font-size: 15px;
   font-weight: 300;
-  color: rgba(232,223,200,0.55);
+  color: rgba(232,223,200,0.6);
   line-height: 1.85;
 }
 
 /* ─────────────────────────────────────────
    HOW IT WORKS
 ───────────────────────────────────────── */
-#how { padding: 120px 52px; }
+#how {
+  padding: 140px 52px;
+  background: var(--bg);
+  position: relative;
+  z-index: 20;
+  border-top: 1px solid var(--border);
+}
 
 .how-head {
   display: grid;
@@ -373,9 +406,9 @@ h2 {
   margin-bottom: 80px;
 }
 .how-head p {
-  font-size: 15px;
+  font-size: 17px;
   font-weight: 300;
-  color: rgba(232,223,200,0.55);
+  color: rgba(232,223,200,0.6);
   line-height: 1.9;
   align-self: end;
 }
@@ -383,51 +416,74 @@ h2 {
 .steps {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 1px;
-  background: var(--border);
+  gap: 24px;
 }
 .step {
-  background: var(--glass-bg);
-  backdrop-filter: var(--glass-blur);
-  -webkit-backdrop-filter: var(--glass-blur);
-  padding: 44px 36px;
+  background: transparent;
+  padding: 44px 0 44px 36px;
+  border-left: 2px solid transparent;
+  transition: border-color 0.5s ease;
+  position: relative;
 }
+.step.in { border-color: var(--amber); }
 .step-num {
-  width: 56px; height: 56px;
-  border: 1px solid var(--amber);
-  display: flex;
-  align-items: center;
-  justify-content: center;
   font-family: 'Space Mono', monospace;
-  font-size: 12px;
+  font-size: 11px;
+  letter-spacing: 0.18em;
   color: var(--amber);
-  letter-spacing: 0.1em;
-  margin-bottom: 36px;
+  margin-bottom: 32px;
+  opacity: 0.7;
 }
 .step h3 {
-  font-size: 19px;
+  font-size: 22px;
   font-weight: 600;
   color: var(--warm-wht);
-  margin-bottom: 12px;
+  margin-bottom: 14px;
   letter-spacing: -0.01em;
 }
 .step p {
-  font-size: 13px;
+  font-size: 16px;
   font-weight: 300;
-  color: rgba(232,223,200,0.55);
+  color: rgba(232,223,200,0.6);
   line-height: 1.85;
+}
+
+/* top amber rule between services and how */
+#how::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 52px; right: 52px;
+  height: 1px;
+  background: linear-gradient(to right, var(--amber), transparent);
+  opacity: 0.4;
 }
 
 /* ─────────────────────────────────────────
    WHY ROYSTACK
 ───────────────────────────────────────── */
 #why {
-  background: var(--glass-bg);
-  backdrop-filter: var(--glass-blur);
-  -webkit-backdrop-filter: var(--glass-blur);
+  background: var(--bg);
   border-top: 1px solid var(--border);
-  border-bottom: 1px solid var(--border);
-  padding: 120px 52px;
+  padding: 140px 52px;
+  position: relative;
+  z-index: 20;
+  overflow: hidden;
+}
+
+/* giant watermark R */
+#why::before {
+  content: 'R';
+  position: absolute;
+  top: -40px;
+  right: -20px;
+  font-size: 38vw;
+  font-weight: 700;
+  color: transparent;
+  -webkit-text-stroke: 1px rgba(191,117,32,0.06);
+  line-height: 1;
+  pointer-events: none;
+  user-select: none;
+  letter-spacing: -0.05em;
 }
 
 .why-layout {
@@ -435,19 +491,20 @@ h2 {
   grid-template-columns: 1fr 1fr;
   gap: 100px;
   align-items: start;
+  position: relative;
 }
-.why-left h2 { margin-bottom: 24px; }
+.why-left h2 { margin-bottom: 28px; }
 .why-left > p {
-  font-size: 15px;
+  font-size: 17px;
   font-weight: 300;
-  color: rgba(232,223,200,0.55);
+  color: rgba(232,223,200,0.6);
   line-height: 1.9;
   margin-bottom: 16px;
 }
 
 .diff-list { margin-top: 48px; }
 .diff {
-  padding: 22px 0;
+  padding: 24px 0;
   border-bottom: 1px solid var(--border);
   display: grid;
   grid-template-columns: 18px 1fr;
@@ -456,44 +513,63 @@ h2 {
 .diff:first-child { border-top: 1px solid var(--border); }
 .diff-n {
   font-family: 'Space Mono', monospace;
-  font-size: 9px;
+  font-size: 10px;
   color: var(--amber);
   padding-top: 3px;
 }
 .diff h4 {
-  font-size: 15px;
+  font-size: 17px;
   font-weight: 600;
   color: var(--warm-wht);
-  margin-bottom: 5px;
+  margin-bottom: 6px;
 }
 .diff p {
-  font-size: 12px;
+  font-size: 15px;
   font-weight: 300;
-  color: rgba(232,223,200,0.5);
-  line-height: 1.75;
+  color: rgba(232,223,200,0.55);
+  line-height: 1.8;
 }
 
 /* ─────────────────────────────────────────
    CONTACT
 ───────────────────────────────────────── */
-#contact { padding: 120px 52px 140px; }
+#contact {
+  padding: 140px 52px 160px;
+  background: var(--bg);
+  border-top: 1px solid var(--border);
+  position: relative;
+  z-index: 20;
+  overflow: hidden;
+}
+
+/* radial amber glow behind form */
+#contact::after {
+  content: '';
+  position: absolute;
+  right: 0; bottom: 0;
+  width: 60%; height: 80%;
+  background: radial-gradient(ellipse at 70% 70%, rgba(191,117,32,0.07) 0%, transparent 70%);
+  pointer-events: none;
+}
 
 .contact-layout {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 100px;
   margin-top: 60px;
+  position: relative;
+  z-index: 1;
 }
 .contact-left > p {
-  font-size: 15px;
+  font-size: 17px;
   font-weight: 300;
-  color: rgba(232,223,200,0.55);
+  color: rgba(232,223,200,0.6);
   line-height: 1.9;
   margin-bottom: 32px;
 }
 .contact-email {
   font-family: 'Space Mono', monospace;
-  font-size: 11px;
+  font-size: 12px;
   letter-spacing: 0.12em;
   color: var(--amber);
   text-decoration: none;
@@ -504,10 +580,9 @@ h2 {
 .contact-email:hover { border-color: var(--amber); }
 
 .form-wrap {
-  background: var(--glass-bg);
-  backdrop-filter: var(--glass-blur);
-  -webkit-backdrop-filter: var(--glass-blur);
+  background: rgba(255,255,255,0.02);
   border: 1px solid var(--border);
+  border-top: 2px solid var(--amber);
   padding: 44px 40px;
 }
 form { display: flex; flex-direction: column; gap: 16px; }
@@ -684,6 +759,10 @@ footer {
 </style>
 </head>
 <body>
+
+<!-- VIDEO FADE CURTAIN + GRAIN -->
+<div id="video-curtain"></div>
+<div id="grain"></div>
 
 <!-- VIDEO BACKGROUND -->
 <div id="video-bg">
@@ -910,8 +989,25 @@ footer {
 <script>
   // ── NAV ─────────────────────────────────────────────────────────────
   const nav = document.getElementById('nav');
+  const curtain = document.getElementById('video-curtain');
+  const grain = document.getElementById('grain');
+  const howSection = document.getElementById('how');
+
   window.addEventListener('scroll', () => {
     nav.classList.toggle('solid', window.scrollY > 40);
+
+    // Fade video out when #how comes into view
+    const howTop = howSection.getBoundingClientRect().top;
+    const fadeStart = window.innerHeight * 0.6;
+    const fadeEnd = window.innerHeight * 0.1;
+    if (howTop < fadeStart) {
+      const progress = Math.min(1, Math.max(0, (fadeStart - howTop) / (fadeStart - fadeEnd)));
+      curtain.style.opacity = progress;
+      grain.style.opacity = progress * 0.6;
+    } else {
+      curtain.style.opacity = 0;
+      grain.style.opacity = 0;
+    }
   }, { passive: true });
 
   // ── SCROLL REVEAL ────────────────────────────────────────────────────
@@ -921,6 +1017,17 @@ footer {
     });
   }, { threshold: 0.12 });
   document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+  // Step border animation
+  const stepObserver = new IntersectionObserver(entries => {
+    entries.forEach((e, i) => {
+      if (e.isIntersecting) {
+        setTimeout(() => e.target.classList.add('in'), i * 150);
+        stepObserver.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.3 });
+  document.querySelectorAll('.step').forEach(el => stepObserver.observe(el));
 
   // Trigger hero immediately
   requestAnimationFrame(() => {
