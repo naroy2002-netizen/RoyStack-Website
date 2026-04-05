@@ -1,0 +1,843 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RoyStack — AI Automation & Website Building</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Space+Mono:ital,wght@0,400;0,700&display=swap" rel="stylesheet">
+<style>
+
+/* ─────────────────────────────────────────
+   RESET & TOKENS
+───────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --black:      #05030200;
+  --bg:         #060402;
+  --amber:      #bf7520;
+  --amber-lt:   #d98a30;
+  --gold:       #c89848;
+  --warm-wht:   #f2eadb;
+  --text:       #e8dfc8;
+  --muted:      #7a6e5a;
+  --border:     rgba(191,117,32,0.18);
+  --glass-bg:   rgba(6,4,2,0.78);
+  --glass-blur: blur(24px);
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Space Grotesk', sans-serif;
+  overflow-x: hidden;
+}
+
+/* ─────────────────────────────────────────
+   VIDEO BACKGROUND
+───────────────────────────────────────── */
+#video-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+#video-bg video {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Layered overlays for legibility */
+#video-bg::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    /* strong vignette around edges */
+    radial-gradient(ellipse at 50% 50%, transparent 30%, rgba(6,4,2,0.65) 100%),
+    /* base tint */
+    rgba(6,4,2,0.42);
+}
+
+/* ─────────────────────────────────────────
+   NAV
+───────────────────────────────────────── */
+nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 200;
+  padding: 24px 52px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: background 0.5s ease, padding 0.4s ease, border-color 0.5s;
+  border-bottom: 1px solid transparent;
+}
+nav.solid {
+  background: rgba(6,4,2,0.88);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  padding: 14px 52px;
+  border-color: var(--border);
+}
+.nav-logo { display: flex; align-items: center; text-decoration: none; }
+.nav-logo img {
+  height: 46px;
+  display: block;
+}
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 40px;
+  list-style: none;
+}
+.nav-links a {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(242,234,219,0.6);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+.nav-links a:hover { color: var(--warm-wht); }
+.nav-cta {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--bg) !important;
+  background: var(--amber);
+  padding: 10px 26px;
+  text-decoration: none;
+  transition: background 0.2s !important;
+}
+.nav-cta:hover { background: var(--amber-lt) !important; color: var(--bg) !important; }
+
+/* ─────────────────────────────────────────
+   PAGE WRAPPER
+───────────────────────────────────────── */
+.page { position: relative; z-index: 10; }
+
+/* ─────────────────────────────────────────
+   HERO
+───────────────────────────────────────── */
+#hero {
+  min-height: 100vh;
+  display: flex;
+  align-items: flex-end;
+  padding: 0 52px 96px;
+  position: relative;
+}
+
+.hero-card {
+  max-width: 680px;
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--border);
+  border-bottom: 3px solid var(--amber);
+  padding: 52px 56px;
+}
+
+.eyebrow {
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.38em;
+  color: var(--amber);
+  text-transform: uppercase;
+  margin-bottom: 28px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.eyebrow::before {
+  content: '';
+  display: block;
+  width: 32px; height: 1px;
+  background: var(--amber);
+  flex-shrink: 0;
+}
+
+h1 {
+  font-size: clamp(44px, 5.5vw, 80px);
+  font-weight: 700;
+  line-height: 1.02;
+  letter-spacing: -0.025em;
+  color: var(--warm-wht);
+  margin-bottom: 22px;
+}
+h1 em { font-style: normal; color: var(--amber); }
+
+.hero-sub {
+  font-size: 16px;
+  font-weight: 300;
+  color: rgba(232,223,200,0.75);
+  line-height: 1.8;
+  margin-bottom: 44px;
+  max-width: 440px;
+}
+
+.btn-row { display: flex; align-items: center; gap: 24px; flex-wrap: wrap; }
+
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--bg);
+  background: var(--amber);
+  text-decoration: none;
+  padding: 16px 34px;
+  transition: background 0.2s, transform 0.15s;
+  white-space: nowrap;
+}
+.btn-primary:hover { background: var(--amber-lt); transform: translateY(-1px); }
+.btn-primary svg { width: 12px; height: 12px; flex-shrink: 0; }
+
+.btn-ghost {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(232,223,200,0.6);
+  text-decoration: none;
+  border-bottom: 1px solid rgba(232,223,200,0.2);
+  padding-bottom: 2px;
+  transition: color 0.2s, border-color 0.2s;
+}
+.btn-ghost:hover { color: var(--warm-wht); border-color: var(--warm-wht); }
+
+/* scroll indicator */
+.scroll-hint {
+  position: absolute;
+  bottom: 36px;
+  right: 52px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-family: 'Space Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.3em;
+  color: rgba(232,223,200,0.35);
+  text-transform: uppercase;
+}
+.scroll-hint::after {
+  content: '';
+  display: block;
+  width: 1px;
+  height: 48px;
+  background: linear-gradient(to bottom, rgba(191,117,32,0.5), transparent);
+}
+
+/* ─────────────────────────────────────────
+   SHARED SECTION STYLES
+───────────────────────────────────────── */
+section { padding: 120px 52px; }
+
+.section-tag {
+  font-family: 'Space Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.38em;
+  color: var(--amber);
+  text-transform: uppercase;
+  margin-bottom: 18px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.section-tag::before {
+  content: '';
+  display: block;
+  width: 22px; height: 1px;
+  background: var(--amber);
+}
+
+h2 {
+  font-size: clamp(32px, 4vw, 54px);
+  font-weight: 700;
+  line-height: 1.06;
+  letter-spacing: -0.022em;
+  color: var(--warm-wht);
+}
+
+/* reveal animation */
+.reveal {
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity 0.75s ease, transform 0.75s ease;
+}
+.reveal.in { opacity: 1; transform: none; }
+.reveal.d1 { transition-delay: 0.1s; }
+.reveal.d2 { transition-delay: 0.2s; }
+.reveal.d3 { transition-delay: 0.3s; }
+.reveal.d4 { transition-delay: 0.4s; }
+
+/* ─────────────────────────────────────────
+   SERVICES
+───────────────────────────────────────── */
+#services {
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+
+.services-head {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 60px;
+  align-items: end;
+  margin-bottom: 72px;
+}
+.services-head p {
+  font-size: 16px;
+  font-weight: 300;
+  color: rgba(232,223,200,0.6);
+  line-height: 1.85;
+  align-self: end;
+}
+
+.services-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  background: var(--border);
+}
+.svc-card {
+  background: rgba(6,4,2,0.6);
+  padding: 44px 36px;
+  position: relative;
+  overflow: hidden;
+  transition: background 0.3s;
+}
+.svc-card:hover { background: rgba(12,8,4,0.8); }
+.svc-card::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 36px; right: 36px;
+  height: 2px;
+  background: var(--amber);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.4s ease;
+}
+.svc-card:hover::after { transform: scaleX(1); }
+
+.svc-num {
+  font-family: 'Space Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.2em;
+  color: var(--amber);
+  opacity: 0.65;
+  margin-bottom: 36px;
+}
+.svc-icon {
+  width: 36px; height: 36px;
+  color: var(--amber);
+  margin-bottom: 24px;
+}
+.svc-card h3 {
+  font-size: 19px;
+  font-weight: 600;
+  color: var(--warm-wht);
+  letter-spacing: -0.01em;
+  margin-bottom: 12px;
+}
+.svc-card p {
+  font-size: 13px;
+  font-weight: 300;
+  color: rgba(232,223,200,0.55);
+  line-height: 1.85;
+}
+
+/* ─────────────────────────────────────────
+   HOW IT WORKS
+───────────────────────────────────────── */
+#how { padding: 120px 52px; }
+
+.how-head {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 80px;
+  align-items: end;
+  margin-bottom: 80px;
+}
+.how-head p {
+  font-size: 15px;
+  font-weight: 300;
+  color: rgba(232,223,200,0.55);
+  line-height: 1.9;
+  align-self: end;
+}
+
+.steps {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  background: var(--border);
+}
+.step {
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  padding: 44px 36px;
+}
+.step-num {
+  width: 56px; height: 56px;
+  border: 1px solid var(--amber);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Space Mono', monospace;
+  font-size: 12px;
+  color: var(--amber);
+  letter-spacing: 0.1em;
+  margin-bottom: 36px;
+}
+.step h3 {
+  font-size: 19px;
+  font-weight: 600;
+  color: var(--warm-wht);
+  margin-bottom: 12px;
+  letter-spacing: -0.01em;
+}
+.step p {
+  font-size: 13px;
+  font-weight: 300;
+  color: rgba(232,223,200,0.55);
+  line-height: 1.85;
+}
+
+/* ─────────────────────────────────────────
+   WHY ROYSTACK
+───────────────────────────────────────── */
+#why {
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  padding: 120px 52px;
+}
+
+.why-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 100px;
+  align-items: start;
+}
+.why-left h2 { margin-bottom: 24px; }
+.why-left > p {
+  font-size: 15px;
+  font-weight: 300;
+  color: rgba(232,223,200,0.55);
+  line-height: 1.9;
+  margin-bottom: 16px;
+}
+
+.diff-list { margin-top: 48px; }
+.diff {
+  padding: 22px 0;
+  border-bottom: 1px solid var(--border);
+  display: grid;
+  grid-template-columns: 18px 1fr;
+  gap: 20px;
+}
+.diff:first-child { border-top: 1px solid var(--border); }
+.diff-n {
+  font-family: 'Space Mono', monospace;
+  font-size: 9px;
+  color: var(--amber);
+  padding-top: 3px;
+}
+.diff h4 {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--warm-wht);
+  margin-bottom: 5px;
+}
+.diff p {
+  font-size: 12px;
+  font-weight: 300;
+  color: rgba(232,223,200,0.5);
+  line-height: 1.75;
+}
+
+/* ─────────────────────────────────────────
+   CONTACT
+───────────────────────────────────────── */
+#contact { padding: 120px 52px 140px; }
+
+.contact-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 100px;
+  margin-top: 60px;
+}
+.contact-left > p {
+  font-size: 15px;
+  font-weight: 300;
+  color: rgba(232,223,200,0.55);
+  line-height: 1.9;
+  margin-bottom: 32px;
+}
+.contact-email {
+  font-family: 'Space Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  color: var(--amber);
+  text-decoration: none;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 3px;
+  transition: border-color 0.2s;
+}
+.contact-email:hover { border-color: var(--amber); }
+
+.form-wrap {
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--border);
+  padding: 44px 40px;
+}
+form { display: flex; flex-direction: column; gap: 16px; }
+.f-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.field { display: flex; flex-direction: column; gap: 7px; }
+label {
+  font-family: 'Space Mono', monospace;
+  font-size: 8px;
+  letter-spacing: 0.3em;
+  color: var(--muted);
+  text-transform: uppercase;
+}
+input, textarea, select {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--border);
+  color: var(--warm-wht);
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 14px;
+  font-weight: 300;
+  padding: 13px 15px;
+  outline: none;
+  transition: border-color 0.2s, background 0.2s;
+  width: 100%;
+  border-radius: 0;
+  -webkit-appearance: none;
+}
+input:focus, textarea:focus, select:focus {
+  border-color: var(--amber);
+  background: rgba(255,255,255,0.06);
+}
+input::placeholder, textarea::placeholder { color: var(--muted); opacity: 0.5; }
+textarea { resize: vertical; min-height: 108px; }
+select option { background: #0e0905; }
+
+.btn-submit {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--bg);
+  background: var(--amber);
+  border: none;
+  padding: 16px 36px;
+  cursor: pointer;
+  align-self: flex-start;
+  transition: background 0.2s, transform 0.15s;
+  margin-top: 4px;
+}
+.btn-submit:hover { background: var(--amber-lt); transform: translateY(-1px); }
+
+/* ─────────────────────────────────────────
+   FOOTER
+───────────────────────────────────────── */
+footer {
+  background: rgba(4,2,1,0.96);
+  border-top: 1px solid var(--border);
+  padding: 32px 52px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.footer-logo img { height: 28px; opacity: 0.35; display: block; }
+.footer-copy {
+  font-family: 'Space Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.14em;
+  color: var(--muted);
+  opacity: 0.5;
+}
+
+/* ─────────────────────────────────────────
+   RESPONSIVE
+───────────────────────────────────────── */
+@media (max-width: 1024px) {
+  .services-head { grid-template-columns: 1fr; gap: 24px; }
+  .how-head { grid-template-columns: 1fr; gap: 24px; }
+  .why-layout { grid-template-columns: 1fr; gap: 56px; }
+  .contact-layout { grid-template-columns: 1fr; gap: 52px; }
+}
+@media (max-width: 800px) {
+  nav { padding: 20px 24px; }
+  nav.solid { padding: 13px 24px; }
+  .nav-links { display: none; }
+  section, #services, #how, #why, #contact { padding: 80px 24px; }
+  #hero { padding: 0 24px 72px; }
+  .hero-card { padding: 36px 28px; }
+  .services-grid, .steps { grid-template-columns: 1fr; }
+  .f-row { grid-template-columns: 1fr; }
+  footer { padding: 28px 24px; }
+  .scroll-hint { display: none; }
+}
+
+</style>
+</head>
+<body>
+
+<!-- VIDEO BACKGROUND -->
+<div id="video-bg">
+  <video id="bg-video" autoplay muted playsinline>
+    <source src="../RoyStack animation.mp4" type="video/mp4">
+  </video>
+</div>
+
+<!-- PAGE -->
+<div class="page">
+
+  <!-- NAV -->
+  <nav id="nav">
+    <a href="#" class="nav-logo">
+      <img src="logo.png" alt="RoyStack">
+    </a>
+    <ul class="nav-links">
+      <li><a href="#services">Services</a></li>
+      <li><a href="#how">Process</a></li>
+      <li><a href="#why">Why Us</a></li>
+      <li><a href="#contact" class="nav-cta">Start a Project</a></li>
+    </ul>
+  </nav>
+
+  <!-- HERO -->
+  <section id="hero">
+    <div class="hero-card reveal">
+      <div class="eyebrow">AI Automation &amp; Web Design</div>
+      <h1>Build Smarter.<br><em>Grow Faster.</em></h1>
+      <p class="hero-sub">RoyStack engineers AI-powered systems and high-performance websites that work while you sleep.</p>
+      <div class="btn-row">
+        <a href="#contact" class="btn-primary">
+          Start a Project
+          <svg viewBox="0 0 12 12" fill="none"><path d="M1 6H11M6 1L11 6L6 11" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+        <a href="#services" class="btn-ghost">See What We Do</a>
+      </div>
+    </div>
+    <div class="scroll-hint">Scroll</div>
+  </section>
+
+  <!-- SERVICES -->
+  <section id="services">
+    <div class="services-head">
+      <div>
+        <div class="section-tag reveal">What We Do</div>
+        <h2 class="reveal d1">Intelligence.<br>Execution.<br>Results.</h2>
+      </div>
+      <p class="reveal d2">We build the systems that eliminate your bottlenecks and the websites that convert. Every project is precision-engineered for performance.</p>
+    </div>
+    <div class="services-grid">
+      <div class="svc-card reveal">
+        <div class="svc-num">01</div>
+        <svg class="svc-icon" viewBox="0 0 36 36" fill="none">
+          <rect x="3" y="10" width="30" height="20" stroke="currentColor" stroke-width="1.4"/>
+          <path d="M10 22L14 17L18 20L22 14L26 20" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M10 6H26" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+        </svg>
+        <h3>AI Automation</h3>
+        <p>Custom workflows that eliminate repetitive operations — from lead handling to content pipelines. Your business runs while you focus on what matters.</p>
+      </div>
+      <div class="svc-card reveal d1">
+        <div class="svc-num">02</div>
+        <svg class="svc-icon" viewBox="0 0 36 36" fill="none">
+          <rect x="3" y="7" width="30" height="22" stroke="currentColor" stroke-width="1.4"/>
+          <path d="M3 13H33" stroke="currentColor" stroke-width="1.4"/>
+          <circle cx="8" cy="10" r="1.2" fill="currentColor"/>
+          <circle cx="12.5" cy="10" r="1.2" fill="currentColor"/>
+          <path d="M12 21L16 17L20 21L24 16" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <h3>Website Building</h3>
+        <p>High-performance websites built from the ground up. Fast, responsive, and designed to convert — no templates, no compromises.</p>
+      </div>
+      <div class="svc-card reveal d2">
+        <div class="svc-num">03</div>
+        <svg class="svc-icon" viewBox="0 0 36 36" fill="none">
+          <circle cx="18" cy="18" r="13" stroke="currentColor" stroke-width="1.4"/>
+          <path d="M18 5V18L25 25" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+        </svg>
+        <h3>Growth Systems</h3>
+        <p>Strategy that connects your tools, data, and workflows into a single operating system — built to scale intelligently from day one.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section id="how">
+    <div class="how-head">
+      <div>
+        <div class="section-tag reveal">The Process</div>
+        <h2 class="reveal d1">Three steps.<br>Zero friction.</h2>
+      </div>
+      <p class="reveal d2">No black boxes. No guesswork. Every engagement follows a clear process designed to move fast and stay precise.</p>
+    </div>
+    <div class="steps">
+      <div class="step reveal">
+        <div class="step-num">01</div>
+        <h3>Discovery</h3>
+        <p>We map your operations, identify friction points, and define exactly what needs to be built. No assumptions.</p>
+      </div>
+      <div class="step reveal d1">
+        <div class="step-num">02</div>
+        <h3>Build</h3>
+        <p>We engineer your system with precision. You see progress at every stage — not just at the finish line.</p>
+      </div>
+      <div class="step reveal d2">
+        <div class="step-num">03</div>
+        <h3>Deploy &amp; Optimize</h3>
+        <p>We launch, monitor, and refine until the system performs. Delivery is never the end — it's the beginning.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHY ROYSTACK -->
+  <section id="why">
+    <div class="why-layout">
+      <div class="why-left">
+        <div class="section-tag reveal">Why RoyStack</div>
+        <h2 class="reveal d1">Built different.<br>On purpose.</h2>
+        <p class="reveal d2">Most agencies deliver deliverables. We deliver leverage — systems and websites that compound over time.</p>
+        <p class="reveal d2">Every engagement is direct. No account managers, no handoffs, no diluted output. You work with the builder.</p>
+        <div class="diff-list">
+          <div class="diff reveal d1">
+            <span class="diff-n">01</span>
+            <div>
+              <h4>End-to-End Ownership</h4>
+              <p>Strategy, design, and execution under one roof. No context lost between departments.</p>
+            </div>
+          </div>
+          <div class="diff reveal d2">
+            <span class="diff-n">02</span>
+            <div>
+              <h4>AI-Native by Default</h4>
+              <p>We don't bolt AI onto existing processes. We build with it from the start.</p>
+            </div>
+          </div>
+          <div class="diff reveal d3">
+            <span class="diff-n">03</span>
+            <div>
+              <h4>Speed Without Compromise</h4>
+              <p>Fast delivery through precision — not shortcuts. We move quickly because we plan well.</p>
+            </div>
+          </div>
+          <div class="diff reveal d4">
+            <span class="diff-n">04</span>
+            <div>
+              <h4>Results You Can Measure</h4>
+              <p>Every system is tied to a clear outcome. If you can't measure it, we won't build it.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- intentionally left open for visual breathing room -->
+      <div></div>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section id="contact">
+    <div class="section-tag reveal">Let's Build</div>
+    <h2 class="reveal d1" style="margin-bottom:0;">Ready to start?</h2>
+    <div class="contact-layout">
+      <div class="contact-left reveal d1">
+        <p>Tell us what you're working on. We respond within one business day with a clear path forward.</p>
+        <a href="mailto:hello@roystack.com" class="contact-email">hello@roystack.com</a>
+      </div>
+      <div class="form-wrap reveal d2">
+        <form id="cform" action="https://formspree.io/f/naroy2002@gmail.com" method="POST">
+          <div class="f-row">
+            <div class="field">
+              <label for="nm">Name</label>
+              <input id="nm" name="name" type="text" placeholder="Your name" required>
+            </div>
+            <div class="field">
+              <label for="em">Email</label>
+              <input id="em" name="email" type="email" placeholder="your@email.com" required>
+            </div>
+          </div>
+          <div class="field">
+            <label for="svc">Service</label>
+            <select id="svc" name="service">
+              <option value="">Select a service</option>
+              <option>AI Automation</option>
+              <option>Website Build</option>
+              <option>Both</option>
+              <option>Something else</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="msg">Project details</label>
+            <textarea id="msg" name="message" placeholder="What are you building, and what's holding you back?"></textarea>
+          </div>
+          <button type="submit" class="btn-submit">Send Message</button>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-logo">
+      <img src="logo.png" alt="RoyStack">
+    </div>
+    <span class="footer-copy">&copy; 2026 RoyStack. All rights reserved.</span>
+  </footer>
+
+</div><!-- /.page -->
+
+<script>
+  // ── NAV ─────────────────────────────────────────────────────────────
+  const nav = document.getElementById('nav');
+  window.addEventListener('scroll', () => {
+    nav.classList.toggle('solid', window.scrollY > 40);
+  }, { passive: true });
+
+  // ── SCROLL REVEAL ────────────────────────────────────────────────────
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) { e.target.classList.add('in'); observer.unobserve(e.target); }
+    });
+  }, { threshold: 0.12 });
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+  // Trigger hero immediately
+  requestAnimationFrame(() => {
+    document.querySelectorAll('#hero .reveal').forEach(el => el.classList.add('in'));
+  });
+
+  // ── VIDEO: FREEZE ON LAST FRAME ──────────────────────────────────────
+  const bgVideo = document.getElementById('bg-video');
+  bgVideo.addEventListener('ended', () => {
+    bgVideo.pause();
+    // Stay on the last frame by not looping
+  });
+</script>
+</body>
+</html>
